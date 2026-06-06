@@ -95,3 +95,7 @@ This project was built as a beginner-friendly image classification workflow to u
 ## License
 
 No license has been added yet.
+
+## BY 
+
+Amiteshwar Singh
