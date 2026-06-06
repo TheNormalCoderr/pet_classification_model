@@ -2,12 +2,13 @@ import numpy as np
 import glob
 import os
 import tensorflow as tf
+import matplotlib.pyplot as plt
 from keras.utils import load_img, img_to_array
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 # Path to the Oxford-IIIT Pet image dataset.
-images_path = "/Users/amiteshwarsingh/Documents/AI_ML_DL/classification_pet_faces/oxford-iiit-pet/images"
+images_path = "/Users/amiteshwarsingh/Documents/AI_ML_DL/classification_pet_faces/oxford_IIIT_pet_dataset/images"
 
 def image_name_to_label(name):
     return ' '.join(os.path.splitext(name.lower())[0].rsplit('_')[:-1])
@@ -105,6 +106,26 @@ history = model.fit(
     batch_size=32,
     callbacks=[early_stopping]
 )
+
+# Plot training curves for accuracy and loss.
+epochs_range = range(1, len(history.history["accuracy"]) + 1)
+plt.figure(figsize=(15, 6))
+
+plt.subplot(1, 2, 1)
+plt.plot(epochs_range, history.history["accuracy"], label="Training accuracy")
+plt.plot(epochs_range, history.history["val_accuracy"], label="Validation accuracy")
+plt.legend(loc="lower right")
+plt.title("Training and Validation Accuracy")
+
+plt.subplot(1, 2, 2)
+plt.plot(epochs_range, history.history["loss"], label="Training loss")
+plt.plot(epochs_range, history.history["val_loss"], label="Validation loss")
+plt.legend(loc="upper right")
+plt.title("Training and Validation Loss")
+
+plt.tight_layout()
+plt.savefig(os.path.join(os.path.dirname(__file__), "basic_model_training_curves.png"))
+plt.close()
 
 # Final evaluation on the unseen test set.
 test_loss, test_accuracy = model.evaluate(X_test, y_test)
