@@ -1,19 +1,13 @@
-# data prepration libs
-import numpy as np 
-import glob 
-import os 
-import pandas as pd 
-# train test splitting of dataset 
+import numpy as np
+import glob
+import os
+import pandas as pd
 from sklearn.model_selection import train_test_split
-# for loading image and converting it to matrix 
-import tensorflow as tf 
+import tensorflow as tf
 from keras.utils import load_img, img_to_array
-# for model creation and logic 
-from keras import layers, Input, Model
-from keras.models import Sequential
 from keras.applications.resnet import ResNet50, preprocess_input
 
-# path to image dataset folder 
+# Path to the Oxford-IIIT Pet image dataset.
 images_path = "/Users/amiteshwarsingh/Documents/AI_ML_DL/classification_pet_faces/oxford-iiit-pet/images"
 
 def image_name_to_label(name):
@@ -27,8 +21,8 @@ def label_encode(images_label, label):
     label = label.lower()
     return code_dict.get(label, None)
 
-# names retrival from folder and lable code assignment  
-images_name = [os.path.basename(file) for file in glob.glob(os.path.join(images_path,'*.jpg'))]
+# Collect filenames and derive the breed labels from the filename pattern.
+images_name = [os.path.basename(file) for file in glob.glob(os.path.join(images_path, '*.jpg'))]
 
 images_label = sorted(set(image_name_to_label(name) for name in images_name))
 label_to_code = assign_label_code(images_label)
@@ -42,6 +36,7 @@ def features_and_labels(images_name):
         label_code = label_to_code.get(label.lower())
         if label_code is None:
             continue
+        # Load each image and resize it to the fixed model input size.
         img = load_img(os.path.join(images_path, name), target_size=(224, 224))
         img = img_to_array(img, dtype="uint8")
         features.append(img)
@@ -66,12 +61,12 @@ X_train, X_val, y_train, y_val = train_test_split(
     stratify=y_train
 )
 
-# normalizing trainging data images 
+# Preprocess images the way ResNet50 expects.
 X_train = preprocess_input(X_train.astype("float32"))
 X_val = preprocess_input(X_val.astype("float32"))
 X_test = preprocess_input(X_test.astype("float32"))
 
-# augmenting data to vary data for generalization
+# Light augmentation helps the model generalize better.
 data_augmentation = tf.keras.Sequential([
     tf.keras.layers.RandomFlip("horizontal"),
     tf.keras.layers.RandomRotation(0.1),
@@ -94,6 +89,7 @@ model = tf.keras.Sequential([
     tf.keras.layers.Dense(37, activation="softmax")
 ])
 
+# Compile for the 37-breed classification problem.
 model.compile(
     optimizer="adam",
     loss="sparse_categorical_crossentropy",
@@ -114,9 +110,11 @@ history = model.fit(
     callbacks=[early_stopping]
 )
 
+# Final evaluation on the unseen test set.
 test_loss, test_accuracy = model.evaluate(X_test, y_test)
 print(f"Test Loss : {test_loss}, Test accuracy : {test_accuracy}")
 
+# Save training, validation, and test results in one CSV.
 history_df = pd.DataFrame(history.history)
 history_df.insert(0, "phase", [f"epoch_{i + 1}" for i in range(len(history_df))])
 
@@ -133,7 +131,6 @@ results_df.to_csv(
     os.path.join(os.path.dirname(__file__), "pretrained_model_results.csv"),
     index=False,
 )
-
 
 
 

@@ -1,12 +1,12 @@
-import numpy as np 
-import glob 
-import os 
-import tensorflow as tf 
+import numpy as np
+import glob
+import os
+import tensorflow as tf
 from keras.utils import load_img, img_to_array
-import pandas as pd 
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
-# path to image dataset folder 
+# Path to the Oxford-IIIT Pet image dataset.
 images_path = "/Users/amiteshwarsingh/Documents/AI_ML_DL/classification_pet_faces/oxford-iiit-pet/images"
 
 def image_name_to_label(name):
@@ -20,8 +20,8 @@ def label_encode(images_label, label):
     label = label.lower()
     return code_dict.get(label, None)
 
-# names retrival from folder and lable code assignment  
-images_name = [os.path.basename(file) for file in glob.glob(os.path.join(images_path,'*.jpg'))]
+# Collect image filenames and derive the breed labels from the filename pattern.
+images_name = [os.path.basename(file) for file in glob.glob(os.path.join(images_path, '*.jpg'))]
 
 images_label = sorted(set(image_name_to_label(name) for name in images_name))
 label_to_code = assign_label_code(images_label)
@@ -35,6 +35,7 @@ def features_and_labels(images_name):
         label_code = label_to_code.get(label.lower())
         if label_code is None:
             continue
+        # Load each image and resize it to a fixed size for the model.
         img = load_img(os.path.join(images_path, name), target_size=IMG_SIZE)
         img = img_to_array(img, dtype="uint8")
         features.append(img)
@@ -43,7 +44,7 @@ def features_and_labels(images_name):
 
 features_array , labels_array = features_and_labels(images_name)
 
-# splitting data in training and test 
+# Split the dataset into train, validation, and test sets.
 X_train, X_test, y_train, y_test = train_test_split(
     features_array,
     labels_array,
@@ -60,12 +61,12 @@ X_train, X_val, y_train, y_val = train_test_split(
     stratify=y_train
 )
 
-# normalizing trainging data images 
+# Normalize pixel values to the 0-1 range for stable training.
 X_train = X_train.astype("float32") / 255.0
 X_val = X_val.astype("float32") / 255.0
 X_test = X_test.astype("float32") / 255.0
 
-# augmenting data to vary data for generalization
+# Light augmentation helps the model generalize better.
 data_augmentation = tf.keras.Sequential([
     tf.keras.layers.RandomFlip("horizontal"),
     tf.keras.layers.RandomRotation(0.1),
@@ -80,11 +81,11 @@ model = tf.keras.Sequential([
     tf.keras.layers.MaxPooling2D(),
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dropout(0.5), # 50 % neurons gets turned off during training 
+    tf.keras.layers.Dropout(0.5),
     tf.keras.layers.Dense(37, activation='softmax')
 ])
 
-# compiling the model 
+# Compile for a 37-class classification problem with integer labels.
 model.compile(
     optimizer='adam',
     loss='sparse_categorical_crossentropy',
@@ -105,11 +106,11 @@ history = model.fit(
     callbacks=[early_stopping]
 )
 
-# actual evaluation on test dataset 
+# Final evaluation on the unseen test set.
 test_loss, test_accuracy = model.evaluate(X_test, y_test)
 print(f"Test Loss : {test_loss}, Test accuracy : {test_accuracy}")
 
-# store training, validation, and test results in one CSV
+# Save training, validation, and test results in one CSV.
 history_df = pd.DataFrame(history.history)
 history_df.insert(0, "phase", [f"epoch_{i + 1}" for i in range(len(history_df))])
 
