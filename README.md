@@ -68,8 +68,6 @@ classification_pet_faces/
 │   ├── features.py                  # Preprocessing and augmentation
 │   ├── model.py                     # Model definitions (CNN + ResNet50 wrapper)
 │   └── train.py                     # Training loop, evaluation, and CLI entry point
-├── tests/
-│   └── __init__.py
 ├── config.yaml                      # All hyperparameters and paths
 ├── pyproject.toml                   # Package metadata and pip install support
 ├── requirements.txt                 # Pinned dependencies
