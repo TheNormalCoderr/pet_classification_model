@@ -1,0 +1,21 @@
+project:
+  name: pet_face_classification
+
+data:
+  raw_dir: data/raw/oxford_IIIT_pet_dataset
+  images_dir: data/raw/oxford_IIIT_pet_dataset/images
+  processed_dir: data/processed
+
+training:
+  img_size: [224, 224]
+  test_size: 0.2
+  val_size: 0.25
+  random_state_test: 42
+  random_state_val: 1
+  batch_size: 32
+  epochs_basic: 20
+  epochs_pretrained: 10
+
+paths:
+  outputs_dir: outputs
+  models_dir: models

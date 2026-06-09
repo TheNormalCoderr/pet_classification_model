@@ -1,0 +1,40 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+venv/
+env/
+.venv/
+.env
+
+# ── Jupyter ────────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── OS files ───────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Raw dataset (large — download separately via Oxford-IIIT Pet dataset) ─────
+data/raw/
+data/processed/
+
+# ── Saved model artifacts (binary, large) ─────────────────────────────────────
+*.keras
+*.h5
+*.pb
+saved_model/
+
+# ── IDE ────────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+
+# ── Misc ───────────────────────────────────────────────────────────────────────
+*.log
+*.tmp
